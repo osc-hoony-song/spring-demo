@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DEPLOY_DIR = '/home/user/app-test'  // 실제 배포 디렉토리 경로
+        DEPLOY_DIR = '/home/user/app-test/dev'  // 실제 배포 디렉토리 경로
         JAR_NAME = 'demo-0.0.1-SNAPSHOT.jar'  // 빌드된 JAR 파일의 이름
         REPO_URL = 'https://github.com/osc-hoony-song/spring-demo.git'
     }

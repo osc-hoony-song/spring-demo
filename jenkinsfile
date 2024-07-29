@@ -12,7 +12,7 @@ pipeline {
                 script {
                     def branchName = env.BRANCH_NAME
                     echo "Building branch: ${branchName}"
-                    git branch: branchName, url: env.REPO_URL
+                    git url: env.REPO_URL, branch: branchName, changelog: false, poll: false, shallow: true, depth: 1
                 }
             }
         }

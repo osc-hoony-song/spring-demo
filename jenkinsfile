@@ -49,11 +49,9 @@ pipeline {
                 sh "cp ${env.JAR_FILE} ${DEPLOY_DIR}/${JAR_NAME}"
 
                 // 새로운 JAR 파일 실행
-                sh """
-                    sudo nohup java -jar ${DEPLOY_DIR}/${JAR_NAME} > app.log 2>&1 &
-                    cat ${DEPLOY_DIR}/app.log
-                    echo "deploy"
-                """
+               // sh """
+               //     sudo nohup java -jar ${DEPLOY_DIR}/${JAR_NAME} > app.log 2>&1 &
+               // """
             }
         }
     }

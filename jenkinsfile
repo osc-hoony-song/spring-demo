@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Git 저장소에서 소스 코드 가져오기
+                git 'https://github.com/osc-hoony-song/spring-demo.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                // 빌드 도구 사용 (예: Maven)
+                sh './gradlew clean build'
+            }
+        }
+        stage('Test') {
+            steps {
+                // 테스트 실행
+                sh './gradlew test'
+            }
+        }
+    }
+}

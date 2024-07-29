@@ -5,6 +5,9 @@ pipeline {
         JAR_NAME = 'demo-0.0.1-SNAPSHOT.jar'  // 빌드된 JAR 파일의 이름
         REPO_URL = 'https://github.com/osc-hoony-song/spring-demo.git'
     }
+    options {
+        skipDefaultCheckout()  // 자동 체크아웃 방지
+    }
 
     stages {
         stage('Checkout') {
@@ -12,7 +15,10 @@ pipeline {
                 script {
                     def branchName = env.BRANCH_NAME
                     echo "Building branch: ${branchName}"
-                    git branch: branchName, url: env.REPO_URL
+                    checkout([$class: 'GitSCM', branches: [[name: "refs/heads/${branchName}"]],
+                              userRemoteConfigs: [[url: env.REPO_URL]],
+                              doGenerateSubmoduleConfigurations: false, submoduleCfg: [],
+                              extensions: [[$class: 'CloneOption', depth: 1, shallow: true]]])
                 }
             }
         }

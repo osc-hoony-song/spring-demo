@@ -1,16 +1,31 @@
 pipeline {
     agent any
+    environment {
+        DEPLOY_DIR = '/home/user/app-test'  // 실제 배포 디렉토리 경로
+        JAR_NAME = 'demo-0.0.1-SNAPSHOT.jar'  // 빌드된 JAR 파일의 이름
+        REPO_URL = 'https://github.com/osc-hoony-song/spring-demo.git'
+    }
 
     stages {
         stage('Checkout') {
             steps {
-                // Git 저장소에서 소스 코드 가져오기
-                git 'https://github.com/osc-hoony-song/spring-demo.git'
+                script {
+                    def branchName = env.BRANCH_NAME
+                    echo "Building branch: ${branchName}"
+                    git branch: branchName, url: env.REPO_URL
+                }
             }
         }
         stage('Build') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'dev'
+                }
+            }
             steps {
                 // 빌드 도구 사용 (예: Maven)
+                sh 'chmod +x ./gradlew'
                 sh './gradlew clean build'
             }
         }
@@ -18,6 +33,33 @@ pipeline {
             steps {
                 // 테스트 실행
                 sh './gradlew test'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    // 빌드된 JAR 파일 경로 확인
+                    def jarFile = sh(script: "ls build/libs/*.jar | grep -v plain", returnStdout: true).trim()
+                    echo "Built JAR file: ${jarFile}"
+                    env.JAR_FILE = jarFile
+                }
+
+                // 이전에 실행 중인 애플리케이션 종료
+                sh """
+                    if pgrep -f ${JAR_NAME}; then
+                        pkill -f ${JAR_NAME}
+                    fi
+                """
+
+                // JAR 파일을 배포 디렉토리로 복사
+                sh "cp ${env.JAR_FILE} ${DEPLOY_DIR}/${JAR_NAME}"
+
+                // 새로운 JAR 파일 실행
+                sh """
+                    sudo nohup java -jar ${DEPLOY_DIR}/${JAR_NAME} > app.log 2>&1 &
+                    cat ${DEPLOY_DIR}/app.log
+                    echo "deploy"
+                """
             }
         }
     }

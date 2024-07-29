@@ -17,13 +17,6 @@ pipeline {
             }
         }
         stage('Build') {
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'dev'
-                    branch 'stage'
-                }
-            }
             steps {
                 // 빌드 도구 사용 (예: Maven)
                 sh 'chmod +x ./gradlew'
@@ -56,11 +49,11 @@ pipeline {
                 sh "cp ${env.JAR_FILE} ${DEPLOY_DIR}/${JAR_NAME}"
 
                 // 새로운 JAR 파일 실행
-                sh """
-                    sudo nohup java -jar ${DEPLOY_DIR}/${JAR_NAME} > app.log 2>&1 &
-                    cat ${DEPLOY_DIR}/app.log
-                    echo "deploy"
-                """
+                //sh """
+                //    sudo nohup java -jar ${DEPLOY_DIR}/${JAR_NAME} > app.log 2>&1 &
+                //   cat ${DEPLOY_DIR}/app.log
+                //    echo "deploy"
+                //"""
             }
         }
     }

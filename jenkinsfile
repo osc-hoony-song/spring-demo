@@ -47,21 +47,18 @@ pipeline {
                     env.JAR_FILE = jarFile
                 }
                 withCredentials([sshUserPrivateKey(credentialsId: env.CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
-                    sh """
-                    scp -i ${SSH_KEY} -o StrictHostKeyChecking=no ${env.JAR_FILE} ${env.DEST_USER}@${env.DEST_SERVER}:${env.DEPLOY_DIR}/${env.JAR_NAME}
-                    """
+                    sh '''
+                    SCP_COMMAND="scp -i $SSH_KEY -o StrictHostKeyChecking=no ${JAR_FILE} ${DEST_USER}@${DEST_SERVER}:${DEPLOY_DIR}/${JAR_NAME}"
+                    eval $SCP_COMMAND
+                    '''
                 }
 
                 // 대상 서버에서 JAR 파일 실행
                 withCredentials([sshUserPrivateKey(credentialsId: env.CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
-                    sh """
-                    ssh -i ${SSH_KEY} -o StrictHostKeyChecking=no ${env.DEST_USER}@${env.DEST_SERVER} "
-                    if pgrep -f ${env.JAR_NAME}; then
-                        pkill -f ${env.JAR_NAME}
-                    fi
-                    nohup sudo java -jar ${env.DEPLOY_DIR}/${env.JAR_NAME} &
-                    "
-                    """
+                    sh '''
+                    SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${DEST_USER}@${DEST_SERVER} 'if pgrep -f ${JAR_NAME}; then pkill -f ${JAR_NAME}; fi nohup sudo java -jar ${DEPLOY_DIR}/${JAR_NAME} &'"
+                    eval $SSH_COMMAND
+                    '''
                 }
             }
         }

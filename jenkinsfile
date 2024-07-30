@@ -56,7 +56,7 @@ pipeline {
                 // 대상 서버에서 업데이트 스크립트 실행
                 withCredentials([sshUserPrivateKey(credentialsId: env.CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                    SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${DEST_USER}@${DEST_SERVER} 'tmux kill-session -t deploy_session; tmux new-session -d -s deploy_session ${DEPLOY_DIR}/update.sh'"
+                    SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${DEST_USER}@${DEST_SERVER} 'nohup ${DEPLOY_DIR}/update.sh > ${DEPLOY_DIR}/update.log 2>&1 &'"
                     eval $SSH_COMMAND
                     '''
                 }

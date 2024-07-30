@@ -53,10 +53,10 @@ pipeline {
                     '''
                 }
 
-                // 대상 서버에서 JAR 파일 실행
+                // 대상 서버에서 업데이트 스크립트 실행
                 withCredentials([sshUserPrivateKey(credentialsId: env.CREDENTIALS_ID, keyFileVariable: 'SSH_KEY')]) {
                     sh '''
-                    SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${DEST_USER}@${DEST_SERVER} 'if pgrep -f ${JAR_NAME}; then pkill -f ${JAR_NAME}; fi nohup sudo java -jar ${DEPLOY_DIR}/${JAR_NAME} &'"
+                    SSH_COMMAND="ssh -i $SSH_KEY -o StrictHostKeyChecking=no ${DEST_USER}@${DEST_SERVER} '${DEPLOY_DIR}/update.sh'"
                     eval $SSH_COMMAND
                     '''
                 }
